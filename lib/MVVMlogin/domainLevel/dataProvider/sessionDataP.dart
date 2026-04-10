@@ -8,13 +8,18 @@ abstract class SessionKeyDataLevelKeys {
 }
 
 class SessionKeyDataLevel {
-  final Future<SharedPreferences> sharedPref = SharedPreferences.getInstance();
+  final Future<SharedPreferences> _sharedPref = SharedPreferences.getInstance();
 
-  Future<String?> loadData() async {
-    return (await sharedPref).getString(SessionKeyDataLevelKeys._apiKeyToSP);
+  Future<String?> getDataApiKey() async {
+    return (await _sharedPref).getString(SessionKeyDataLevelKeys._apiKeyToSP);
   }
 
-  Future<void> saveData(String apiKey) async {
-    (await sharedPref).setString(SessionKeyDataLevelKeys._apiKeyToSP, apiKey);
+  Future<void> saveDataApiKey(String apiKey) async {
+    (await _sharedPref).setString(SessionKeyDataLevelKeys._apiKeyToSP, apiKey);
+    // remove?
+  }
+
+  Future<void> clearDataApiKey() async {
+    (await _sharedPref).remove(SessionKeyDataLevelKeys._apiKeyToSP);
   }
 }

@@ -3,17 +3,17 @@ import 'package:architecture_training/MVVMarch/domainLevel/repository/userReposi
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class ViewModelState {
+class _ViewModelState {
   final String ageTitle;
-  ViewModelState({required this.ageTitle});
+  _ViewModelState({required this.ageTitle});
 }
 
-class ViewModel extends ChangeNotifier {
+class _ViewModel extends ChangeNotifier {
   final _userRepo = UserRepository();
-  var _state = ViewModelState(ageTitle: '');
-  ViewModelState get state => _state;
+  var _state = _ViewModelState(ageTitle: '');
+  _ViewModelState get state => _state;
 
-  ViewModel() {
+  _ViewModel() {
     loadData();
   }
 
@@ -34,27 +34,29 @@ class ViewModel extends ChangeNotifier {
 
   void _updateState() {
     final user = _userRepo.user;
-    _state = ViewModelState(ageTitle: user.age.toString());
+    _state = _ViewModelState(ageTitle: user.age.toString());
     notifyListeners();
   }
 }
 
+// ui
 class MyLessonAppMvvm extends StatelessWidget {
   const MyLessonAppMvvm({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: ChangeNotifierProvider(
-        create: (context) => ViewModel(),
-        child: UpperWidget(),
-      ),
-    );
+    return Scaffold(body: SafeArea(child: UpperWidget.create()));
   }
 }
 
 class UpperWidget extends StatelessWidget {
   const UpperWidget({super.key});
+  static Widget create() {
+    return ChangeNotifierProvider(
+      create: (context) => _ViewModel(),
+      child: const UpperWidget(),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -76,7 +78,7 @@ class TextView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final title = context.select((ViewModel vm) => vm.state.ageTitle);
+    final title = context.select((_ViewModel vm) => vm.state.ageTitle);
     return Text(title);
   }
 }
@@ -86,7 +88,7 @@ class IncrementVievButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final model = context.read<ViewModel>();
+    final model = context.read<_ViewModel>();
     return ElevatedButton(
       onPressed: model.onIncrementButtonPressed,
       child: Text('++'),
@@ -99,7 +101,7 @@ class DecrementVievButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final model = context.read<ViewModel>();
+    final model = context.read<_ViewModel>();
     return ElevatedButton(
       onPressed: model.onDecrementButtonPressed,
       child: Text('--'),
