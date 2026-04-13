@@ -3,23 +3,31 @@ import 'package:architecture_training/MVVMlogin/domainLevel/dataProvider/authApi
     show AuthIcorerectDataError;
 import 'package:architecture_training/MVVMlogin/domainLevel/repository/authRepository.dart'
     show AuthRepository;
-import 'package:flutter/foundation.dart' show ChangeNotifier;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart'
     show ChangeNotifierProvider, ReadContext, SelectContext;
+
+enum _AuthButtonCanSubmitState { canSubmit, authProgres, disable }
 
 class _ViewModelStateLogining {
   final String authErrorTitle;
   final String currentLogin;
   final String currentPassword;
-  final bool canSubmit;
   final bool isAuthProcess;
+  _AuthButtonCanSubmitState get authButtonState {
+    if (isAuthProcess) {
+      return _AuthButtonCanSubmitState.authProgres;
+    } else if (currentLogin.isNotEmpty && currentPassword.isNotEmpty) {
+      return _AuthButtonCanSubmitState.canSubmit;
+    } else {
+      return _AuthButtonCanSubmitState.disable;
+    }
+  }
 
   _ViewModelStateLogining({
     this.authErrorTitle = '',
     this.currentLogin = '',
     this.currentPassword = '',
-    this.canSubmit = false,
     this.isAuthProcess = false,
   });
 
@@ -27,14 +35,12 @@ class _ViewModelStateLogining {
     String? authErrorTitle,
     String? currentLogin,
     String? currentPassword,
-    bool? canSubmit,
     bool? isAuthProcess,
   }) {
     return _ViewModelStateLogining(
       authErrorTitle: authErrorTitle ?? this.authErrorTitle,
       currentLogin: currentLogin ?? this.currentLogin,
       currentPassword: currentPassword ?? this.currentPassword,
-      canSubmit: canSubmit ?? this.canSubmit,
       isAuthProcess: isAuthProcess ?? this.isAuthProcess,
     );
   }
@@ -42,7 +48,7 @@ class _ViewModelStateLogining {
 
 class _ViewModelToLogining extends ChangeNotifier {
   var _stateLogining = _ViewModelStateLogining();
-  _ViewModelStateLogining get stateL => _stateLogining;
+  _ViewModelStateLogining get stateLogining => _stateLogining;
 
   final AuthRepository _authRepo = AuthRepository();
 
@@ -63,16 +69,39 @@ class _ViewModelToLogining extends ChangeNotifier {
     final login = _stateLogining.currentLogin;
     final password = _stateLogining.currentPassword;
     if (login.isEmpty || password.isEmpty) return;
+    _stateLogining = _stateLogining.copyWith(
+      authErrorTitle: '',
+      isAuthProcess: true,
+    );
+    notifyListeners();
     try {
-      _authRepo.logIn(login, password);
+      await _authRepo.logIn(login, password);
+      _stateLogining = _stateLogining.copyWith(
+        isAuthProcess: false,
+        authErrorTitle: 'Wellcome, logining ok!',
+
+        ///
+      );
+      notifyListeners();
+      await Future<void>.delayed(Duration(seconds: 3));
+
+      ///
+      _stateLogining = _stateLogining.copyWith(authErrorTitle: '');
+
+      ///
+      notifyListeners();
+
+      ///
     } on AuthIcorerectDataError {
       _stateLogining = _stateLogining.copyWith(
-        authErrorTitle: 'login or password error',
+        authErrorTitle: 'Login or password error',
+        isAuthProcess: false,
       );
       notifyListeners();
     } catch (exeption) {
       _stateLogining = _stateLogining.copyWith(
-        authErrorTitle: 'oops. exeption... ',
+        authErrorTitle: 'Oops. exeption... ',
+        isAuthProcess: false,
       );
       notifyListeners();
     }
@@ -97,9 +126,12 @@ class UpperLoginW extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            _LoginTextW(),
-            _PasswordTextW(),
             _ErrorLoginingW(),
+            SizedBox(height: 12),
+            _LoginTextW(),
+            SizedBox(height: 12),
+            _PasswordTextW(),
+            SizedBox(height: 12),
             _ButtonLoginW(),
           ],
         ),
@@ -140,7 +172,7 @@ class _ErrorLoginingW extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final err = context.select(
-      (_ViewModelToLogining model) => model.stateL.authErrorTitle,
+      (_ViewModelToLogining model) => model.stateLogining.authErrorTitle,
     );
     return Text(err);
   }
@@ -149,10 +181,16 @@ class _ErrorLoginingW extends StatelessWidget {
 class _ButtonLoginW extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final _model = context.read<_ViewModelToLogining>();
-    return ElevatedButton(
-      onPressed: _model.onLogInButtonPressed,
-      child: Text('Log In'),
-    );
+    final model = context.read<_ViewModelToLogining>();
+    final buttonState = context.select((_ViewModelToLogining model) {
+      return model.stateLogining.authButtonState;
+    });
+    final authButtonFunc = buttonState == _AuthButtonCanSubmitState.canSubmit
+        ? model.onLogInButtonPressed
+        : null;
+    final authButtonChild = buttonState == _AuthButtonCanSubmitState.authProgres
+        ? CircularProgressIndicator()
+        : const Text('Log In');
+    return ElevatedButton(onPressed: authButtonFunc, child: authButtonChild);
   }
 }
