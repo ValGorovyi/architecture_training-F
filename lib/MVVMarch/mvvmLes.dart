@@ -1,5 +1,8 @@
 import 'package:architecture_training/MVVMarch/domainLevel/repository/userRepository.dart'
     show UserRepository;
+import 'package:architecture_training/MVVMlogin/domainLevel/repository/authRepository.dart'
+    show AuthRepository;
+import 'package:architecture_training/navigationNames/mainNavigationNames.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -9,6 +12,8 @@ class _ViewModelState {
 }
 
 class _ViewModel extends ChangeNotifier {
+  final AuthRepository _authRepo = AuthRepository();
+
   final _userRepo = UserRepository();
   var _state = _ViewModelState(ageTitle: '');
   _ViewModelState get state => _state;
@@ -37,37 +42,56 @@ class _ViewModel extends ChangeNotifier {
     _state = _ViewModelState(ageTitle: user.age.toString());
     notifyListeners();
   }
-}
 
-// ui
-class MyLessonAppMvvm extends StatelessWidget {
-  const MyLessonAppMvvm({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(body: SafeArea(child: UpperWidget.create()));
+  Future<void> onLogoutButtonPressed(BuildContext context) async {
+    await _authRepo.logOut();
+    Navigator.of(context).pushNamedAndRemoveUntil(
+      MainNavigationNames.loaderAddres,
+      (route) => false,
+    );
   }
 }
 
-class UpperWidget extends StatelessWidget {
-  const UpperWidget({super.key});
+// ui
+// class AppCounter extends StatelessWidget {
+//   const AppCounter({super.key});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(body: SafeArea(child: UpperWidget.create()));
+//   }
+// }
+
+class AppCounterWidget extends StatelessWidget {
+  const AppCounterWidget({super.key});
   static Widget create() {
     return ChangeNotifierProvider(
       create: (context) => _ViewModel(),
-      child: const UpperWidget(),
+      child: const AppCounterWidget(),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: const [
-          IncrementVievButton(),
-          DecrementVievButton(),
-          TextView(),
+    final model = context.read<_ViewModel>();
+    return Scaffold(
+      appBar: AppBar(
+        actions: [
+          ElevatedButton(
+            onPressed: () => model.onLogoutButtonPressed(context),
+            child: Icon(Icons.backspace),
+          ),
         ],
+      ),
+      body: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: const [
+            IncrementVievButton(),
+            DecrementVievButton(),
+            TextView(),
+          ],
+        ),
       ),
     );
   }

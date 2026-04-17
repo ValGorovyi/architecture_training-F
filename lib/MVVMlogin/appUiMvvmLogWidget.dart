@@ -1,8 +1,8 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:architecture_training/MVVMlogin/domainLevel/dataProvider/authApiDataProvider.dart'
     show AuthIcorerectDataError;
 import 'package:architecture_training/MVVMlogin/domainLevel/repository/authRepository.dart'
     show AuthRepository;
+import 'package:architecture_training/navigationNames/mainNavigationNames.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart'
     show ChangeNotifierProvider, ReadContext, SelectContext;
@@ -65,7 +65,7 @@ class _ViewModelToLogining extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> onLogInButtonPressed() async {
+  Future<void> onLogInButtonPressed(BuildContext context) async {
     final login = _stateLogining.currentLogin;
     final password = _stateLogining.currentPassword;
     if (login.isEmpty || password.isEmpty) return;
@@ -83,7 +83,7 @@ class _ViewModelToLogining extends ChangeNotifier {
         ///
       );
       notifyListeners();
-      await Future<void>.delayed(Duration(seconds: 3));
+      await Future<void>.delayed(Duration(seconds: 1));
 
       ///
       _stateLogining = _stateLogining.copyWith(authErrorTitle: '');
@@ -92,6 +92,10 @@ class _ViewModelToLogining extends ChangeNotifier {
       notifyListeners();
 
       ///
+      Navigator.of(context).pushNamedAndRemoveUntil(
+        MainNavigationNames.loaderAddres,
+        (route) => false,
+      );
     } on AuthIcorerectDataError {
       _stateLogining = _stateLogining.copyWith(
         authErrorTitle: 'Login or password error',
@@ -108,32 +112,35 @@ class _ViewModelToLogining extends ChangeNotifier {
   }
 }
 
-class UpperLoginW extends StatelessWidget {
-  const UpperLoginW({super.key});
+class AppLoginWidget extends StatelessWidget {
+  const AppLoginWidget({super.key});
 
   static Widget create() {
     return ChangeNotifierProvider(
       create: (context) => _ViewModelToLogining(),
-      child: const UpperLoginW(),
+      child: const AppLoginWidget(),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(22.0),
-      child: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _ErrorLoginingW(),
-            SizedBox(height: 12),
-            _LoginTextW(),
-            SizedBox(height: 12),
-            _PasswordTextW(),
-            SizedBox(height: 12),
-            _ButtonLoginW(),
-          ],
+    return Scaffold(
+      appBar: AppBar(title: Text('Log In page'), centerTitle: true),
+      body: Padding(
+        padding: const EdgeInsets.all(22.0),
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _ErrorLoginingW(),
+              SizedBox(height: 12),
+              _LoginTextW(),
+              SizedBox(height: 12),
+              _PasswordTextW(),
+              SizedBox(height: 12),
+              _ButtonLoginW(),
+            ],
+          ),
         ),
       ),
     );
@@ -191,6 +198,9 @@ class _ButtonLoginW extends StatelessWidget {
     final authButtonChild = buttonState == _AuthButtonCanSubmitState.authProgres
         ? CircularProgressIndicator()
         : const Text('Log In');
-    return ElevatedButton(onPressed: authButtonFunc, child: authButtonChild);
+    return ElevatedButton(
+      onPressed: () => authButtonFunc?.call(context),
+      child: authButtonChild,
+    );
   }
 }
