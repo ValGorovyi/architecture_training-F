@@ -1,20 +1,18 @@
 import 'package:architecture_training/MVVMarch/mvvmLes.dart'
-    show AppCounter, AppCounterWidget;
+    show AppCounterWidget;
 import 'package:architecture_training/MVVMlogin/appUiMvvmLogWidget.dart'
     show AppLoginWidget;
-import 'package:architecture_training/MVVMlogin/domainLevel/repository/authRepository.dart'
-    show AuthRepository;
-import 'package:architecture_training/MVVMlogin/mvvmLogining.dart';
+
 import 'package:architecture_training/loaderWidget.dart';
+import 'package:architecture_training/mvvmDataLoadingDemo/dataLoadingDemoW.dart'
+    show DataloadingDemoW;
 import 'package:architecture_training/navigationNames/mainNavigationNames.dart'
     show MainNavigationNames;
-import 'package:architecture_training/prividerLesson/providerLesson.dart'
-    show MyLessonAppProvider;
+
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 void main() {
-  final app = MainApp();
+  final app = MaterialApp(home: DataloadingDemoW());
   runApp(app);
 }
 //////////////////////////////////////////////
