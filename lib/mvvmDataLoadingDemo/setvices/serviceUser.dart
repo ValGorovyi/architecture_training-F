@@ -9,21 +9,9 @@ typedef UserServiceOnUpdate = void Function(UserEntity);
 class UserService {
   final _userDataProvider = UserDataProvider();
   VoidCallback? _currentOnUpdate;
+  UserEntity get user => _userDataProvider.user;
+  Stream<UserEntity> get userStream => _userDataProvider.userStream;
+  void startListenUserStream() => _userDataProvider.openConect();
 
-  void startListenUser(UserServiceOnUpdate onUpdate) {
-    final currentOnUpdate = () {
-      onUpdate(_userDataProvider.user);
-    };
-    _currentOnUpdate = currentOnUpdate;
-    _userDataProvider.addListener(currentOnUpdate);
-    onUpdate(_userDataProvider.user);
-    _userDataProvider.openConect();
-  }
-
-  void stopListenUser() {
-    final currentOnUpdate = _currentOnUpdate;
-    if (currentOnUpdate != null) {
-      _userDataProvider.removeListener(currentOnUpdate);
-    }
-  }
+  void stopListenUserStream() => _userDataProvider.closeConect();
 }

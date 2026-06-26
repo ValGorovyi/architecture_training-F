@@ -2,18 +2,19 @@ import 'dart:async';
 
 import 'package:architecture_training/mvvmDataLoadingDemo/entity/userEntity.dart'
     show UserEntity;
-import 'package:flutter/material.dart';
 
-class UserDataProvider extends ChangeNotifier {
+class UserDataProvider {
   var _user = UserEntity(age: 0);
   UserEntity get user => _user;
+  final _controller = StreamController<UserEntity>();
+  Stream<UserEntity> get userStream => _controller.stream.asBroadcastStream();
 
   Timer? _timer;
   void openConect() {
     if (_timer != null) return;
-    _timer = Timer.periodic(Duration(seconds: 2), (_) {
+    _timer = Timer.periodic(Duration(seconds: 1), (_) {
       _user = _user.copyWith(age: user.age + 1);
-      notifyListeners();
+      _controller.add(_user);
     });
   }
 
