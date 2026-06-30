@@ -3,8 +3,8 @@ import 'package:architecture_training/mvvmDataLoadingDemo/model/viewM.dart'
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class DataloadingDemoW extends StatelessWidget {
-  const DataloadingDemoW({super.key});
+class DataloadingDemoBlocW extends StatelessWidget {
+  const DataloadingDemoBlocW({super.key});
 
   @override
   Widget build(BuildContext context) {

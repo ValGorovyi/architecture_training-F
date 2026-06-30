@@ -1,18 +1,18 @@
+import 'package:architecture_training/BlocArch/dataBlocW.dart' show DataBlocW;
 import 'package:architecture_training/MVVMarch/mvvmLes.dart'
     show AppCounterWidget;
 import 'package:architecture_training/MVVMlogin/appUiMvvmLogWidget.dart'
     show AppLoginWidget;
 
 import 'package:architecture_training/loaderWidget.dart';
-import 'package:architecture_training/mvvmDataLoadingDemo/dataLoadingDemoW.dart'
-    show DataloadingDemoW;
+
 import 'package:architecture_training/navigationNames/mainNavigationNames.dart'
     show MainNavigationNames;
 
 import 'package:flutter/material.dart';
 
 void main() {
-  final app = MaterialApp(home: DataloadingDemoW());
+  final app = MaterialApp(home: DataBlocW());
   runApp(app);
 }
 //////////////////////////////////////////////

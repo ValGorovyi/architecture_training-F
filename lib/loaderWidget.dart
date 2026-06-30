@@ -2,7 +2,7 @@ import 'package:architecture_training/MVVMlogin/domainLevel/repository/authRepos
     show AuthRepository;
 import 'package:architecture_training/navigationNames/mainNavigationNames.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart' show ChangeNotifierProvider, Provider;
+import 'package:provider/provider.dart' show Provider;
 
 class _LoaderWModel {
   final AuthRepository _authRepo = AuthRepository();
