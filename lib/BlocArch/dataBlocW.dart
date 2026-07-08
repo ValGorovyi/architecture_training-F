@@ -1,5 +1,9 @@
 import 'package:architecture_training/BlocArch/blocs/usersBloc.dart'
-    show UsersBloc, UsersBlocState;
+    show
+        UsersBloc,
+        UsersBlocState,
+        UsersIncrementEventBloc,
+        UsersDecrementEventBloc;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -53,7 +57,7 @@ class IncrementBlocButtonW extends StatelessWidget {
     final bloc = context.read<UsersBloc>();
 
     return ElevatedButton(
-      onPressed: bloc.incrementAge,
+      onPressed: () => bloc.dispatchUserEventBloc(UsersIncrementEventBloc()),
       child: Icon(Icons.plus_one_sharp),
     );
   }
@@ -67,7 +71,7 @@ class DecrementBlocButtonW extends StatelessWidget {
     final bloc = context.read<UsersBloc>();
 
     return ElevatedButton(
-      onPressed: bloc.decrementAge,
+      onPressed: () => bloc.dispatchUserEventBloc(UsersDecrementEventBloc()),
       child: Icon(Icons.exposure_minus_1),
     );
   }

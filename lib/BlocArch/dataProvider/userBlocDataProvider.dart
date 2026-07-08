@@ -6,12 +6,19 @@ import 'package:shared_preferences/shared_preferences.dart'
 class UserDataLevelBloc {
   final Future<SharedPreferences> sharedPref = SharedPreferences.getInstance();
 
+  var counterInt = 0;
+
   Future<UserEntityBl> loadData() async {
     final ageU = (await sharedPref).getInt('intBlocUser') ?? 0;
     return UserEntityBl(age: ageU);
   }
 
   Future<void> saveData(UserEntityBl user) async {
+    counterInt = counterInt + 1;
+    if (counterInt % 2 == 0) {
+      await Future.delayed(Duration(seconds: 1));
+    }
+    print(user.age);
     (await sharedPref).setInt('intBlocUser', user.age);
   }
 }
