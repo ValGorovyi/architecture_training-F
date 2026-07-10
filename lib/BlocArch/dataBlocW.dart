@@ -1,7 +1,7 @@
 import 'package:architecture_training/BlocArch/blocs/usersBloc.dart'
     show
-        UsersBloc,
-        UsersBlocState,
+        UserCubitBl,
+        UsersCubitBlState,
         UsersIncrementEventBloc,
         UsersDecrementEventBloc;
 import 'package:flutter/material.dart';
@@ -13,10 +13,10 @@ class DataBlocW extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Provider(
-      create: (context) => UsersBloc(),
+      create: (context) => UserCubitBl(),
       builder: (context, child) =>
           Scaffold(body: Center(child: WidgetBuilderBloc())),
-      dispose: (context, blocValue) => blocValue.closeConnect(),
+      dispose: (context, cubitValue) => cubitValue.close(),
     );
   }
 }
@@ -38,10 +38,10 @@ class WidgetBuilderBloc extends StatelessWidget {
 class _AppTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final bloc = context.read<UsersBloc>();
-    return StreamBuilder<UsersBlocState>(
-      stream: bloc.stateStream,
-      initialData: bloc.userState,
+    final cubit = context.read<UserCubitBl>();
+    return StreamBuilder<UsersCubitBlState>(
+      stream: cubit.stream,
+      initialData: cubit.state,
       builder: (context, snapshot) {
         final age = snapshot.requireData.currentUser.age;
         return Text('$age');
@@ -55,10 +55,10 @@ class IncrementBlocButtonW extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bloc = context.read<UsersBloc>();
+    final cubit = context.read<UserCubitBl>();
 
     return ElevatedButton(
-      onPressed: () => bloc.dispatchUserEventBloc(UsersIncrementEventBloc()),
+      onPressed: cubit.incrementAge,
       child: Icon(Icons.plus_one_sharp),
     );
   }
@@ -69,10 +69,10 @@ class DecrementBlocButtonW extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bloc = context.read<UsersBloc>();
+    final cubit = context.read<UserCubitBl>();
 
     return ElevatedButton(
-      onPressed: () => bloc.dispatchUserEventBloc(UsersDecrementEventBloc()),
+      onPressed: cubit.decrementAge,
       child: Icon(Icons.exposure_minus_1),
     );
   }
