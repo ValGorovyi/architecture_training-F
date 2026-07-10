@@ -84,4 +84,8 @@ class UsersBloc {
     _streamOfState.listen((state) {});
     dispatchUserEventBloc(UsersInitializedEventBloc());
   }
+
+  void closeConnect() {
+    _stateStreamController.close();
+  }
 }

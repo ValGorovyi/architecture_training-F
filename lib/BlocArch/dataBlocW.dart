@@ -16,6 +16,7 @@ class DataBlocW extends StatelessWidget {
       create: (context) => UsersBloc(),
       builder: (context, child) =>
           Scaffold(body: Center(child: WidgetBuilderBloc())),
+      dispose: (context, blocValue) => blocValue.closeConnect(),
     );
   }
 }
