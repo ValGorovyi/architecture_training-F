@@ -14,10 +14,13 @@ class UserDataLevelBloc {
   }
 
   Future<void> saveData(UserEntityBl user) async {
+    //при быстром нажатии (клац клац клац) наблюдается гонка состояний. не вседа сохраняется и отображается корректно
+    // при блокЛиб баг сохраняется
+
     // counterInt = counterInt + 1;
     // if (counterInt % 2 == 0) {
     // }
-    await Future.delayed(Duration(seconds: 1));
+    // await Future.delayed(Duration(seconds: 1));
     print(user.age);
     (await sharedPref).setInt('intBlocUser', user.age);
   }

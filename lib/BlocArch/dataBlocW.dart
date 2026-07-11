@@ -1,9 +1,9 @@
 import 'package:architecture_training/BlocArch/blocs/usersBloc.dart'
     show
-        UserCubitBl,
-        UsersCubitBlState,
-        UsersIncrementEventBloc,
-        UsersDecrementEventBloc;
+        UserBlocLib,
+        UsersBlocLibState,
+        UserIncrementEventBloc,
+        UserDecrementEventBloc;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -13,10 +13,10 @@ class DataBlocW extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Provider(
-      create: (context) => UserCubitBl(),
+      create: (context) => UserBlocLib(),
       builder: (context, child) =>
           Scaffold(body: Center(child: WidgetBuilderBloc())),
-      dispose: (context, cubitValue) => cubitValue.close(),
+      dispose: (context, blocLibValue) => blocLibValue.close(),
     );
   }
 }
@@ -38,10 +38,10 @@ class WidgetBuilderBloc extends StatelessWidget {
 class _AppTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final cubit = context.read<UserCubitBl>();
-    return StreamBuilder<UsersCubitBlState>(
-      stream: cubit.stream,
-      initialData: cubit.state,
+    final blocLib = context.read<UserBlocLib>();
+    return StreamBuilder<UsersBlocLibState>(
+      stream: blocLib.stream,
+      initialData: blocLib.state,
       builder: (context, snapshot) {
         final age = snapshot.requireData.currentUser.age;
         return Text('$age');
@@ -55,10 +55,10 @@ class IncrementBlocButtonW extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cubit = context.read<UserCubitBl>();
+    final blocLib = context.read<UserBlocLib>();
 
     return ElevatedButton(
-      onPressed: cubit.incrementAge,
+      onPressed: () => blocLib.add(UserIncrementEventBloc()),
       child: Icon(Icons.plus_one_sharp),
     );
   }
@@ -69,10 +69,10 @@ class DecrementBlocButtonW extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cubit = context.read<UserCubitBl>();
+    final blocLib = context.read<UserBlocLib>();
 
     return ElevatedButton(
-      onPressed: cubit.decrementAge,
+      onPressed: () => blocLib.add(UserDecrementEventBloc()),
       child: Icon(Icons.exposure_minus_1),
     );
   }
