@@ -3,7 +3,8 @@ import 'package:architecture_training/BlocArch/blocs/usersBloc.dart'
         UserBlocLib,
         UsersBlocLibState,
         UserIncrementEventBloc,
-        UserDecrementEventBloc;
+        UserDecrementEventBloc,
+        UsersInitializedEventBloc;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -13,7 +14,9 @@ class DataBlocW extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Provider(
-      create: (context) => UserBlocLib(),
+      create: (context) =>
+          UserBlocLib()
+            ..add(UsersInitializedEventBloc()), // загружает данные из хранилища
       builder: (context, child) =>
           Scaffold(body: Center(child: WidgetBuilderBloc())),
       dispose: (context, blocLibValue) => blocLibValue.close(),

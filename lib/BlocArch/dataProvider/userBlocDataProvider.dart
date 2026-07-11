@@ -6,7 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart'
 class UserDataLevelBloc {
   final Future<SharedPreferences> sharedPref = SharedPreferences.getInstance();
 
-  // var counterInt = 0;
+  var counterInt = 0;
 
   Future<UserEntityBl> loadData() async {
     final ageU = (await sharedPref).getInt('intBlocUser') ?? 0;
@@ -17,10 +17,10 @@ class UserDataLevelBloc {
     //при быстром нажатии (клац клац клац) наблюдается гонка состояний. не вседа сохраняется и отображается корректно
     // при блокЛиб баг сохраняется
 
-    // counterInt = counterInt + 1;
-    // if (counterInt % 2 == 0) {
-    // }
-    // await Future.delayed(Duration(seconds: 1));
+    counterInt = counterInt + 1;
+    if (counterInt % 2 == 0) {
+      await Future.delayed(Duration(seconds: 1));
+    }
     print(user.age);
     (await sharedPref).setInt('intBlocUser', user.age);
   }

@@ -5,14 +5,15 @@ import 'package:architecture_training/BlocArch/dataProvider/userBlocDataProvider
 import 'package:architecture_training/BlocArch/entity/userBlocEntity.dart'
     show UserEntityBl;
 import 'package:bloc/bloc.dart';
+import 'package:bloc_concurrency/bloc_concurrency.dart';
 
-abstract class UsersEventsBloc {}
+abstract class UserEventsBloc {}
 
-class UserIncrementEventBloc implements UsersEventsBloc {}
+class UserIncrementEventBloc implements UserEventsBloc {}
 
-class UserDecrementEventBloc implements UsersEventsBloc {}
+class UserDecrementEventBloc implements UserEventsBloc {}
 
-class UsersInitializedEventBloc implements UsersEventsBloc {}
+class UsersInitializedEventBloc implements UserEventsBloc {}
 
 class UsersBlocLibState {
   final UserEntityBl currentUser;
@@ -36,28 +37,29 @@ class UsersBlocLibState {
   int get hashCode => currentUser.hashCode;
 }
 
-class UserBlocLib extends Bloc<UsersEventsBloc, UsersBlocLibState> {
+class UserBlocLib extends Bloc<UserEventsBloc, UsersBlocLibState> {
   final _userDataLevelBloc = UserDataLevelBloc();
   UserBlocLib() : super(UsersBlocLibState(currentUser: UserEntityBl(age: 0))) {
-    on<UsersInitializedEventBloc>((event, emit) async {
-      final user = await _userDataLevelBloc.loadData();
-      emit(UsersBlocLibState(currentUser: user));
-    });
-    on<UserIncrementEventBloc>((event, emit) async {
-      var user = state.currentUser;
-      user = user.copyWith(age: user.age + 1);
-      await _userDataLevelBloc.saveData(user);
-
-      emit(UsersBlocLibState(currentUser: user));
-    });
-    on<UserDecrementEventBloc>((event, emit) async {
-      var user = state.currentUser;
-      user = user.copyWith(age: max(user.age - 1, 0));
-      await _userDataLevelBloc.saveData(user);
-
-      emit(UsersBlocLibState(currentUser: user));
-    });
-    // stream.listen((state) {});
+    on<UserEventsBloc>(
+      (event, emit) async {
+        if (event is UsersInitializedEventBloc) {
+          final user = await _userDataLevelBloc.loadData();
+          emit(UsersBlocLibState(currentUser: user));
+        } else if (event is UserIncrementEventBloc) {
+          var user = state.currentUser;
+          user = user.copyWith(age: user.age + 1);
+          await _userDataLevelBloc.saveData(user);
+          emit(UsersBlocLibState(currentUser: user));
+        } else if (event is UserDecrementEventBloc) {
+          var user = state.currentUser;
+          user = user.copyWith(age: max(user.age - 1, 0));
+          await _userDataLevelBloc.saveData(user);
+          emit(UsersBlocLibState(currentUser: user));
+        }
+      },
+      transformer:
+          sequential(), //фиксит гонку состояний, некккоректную обработку запросов
+    );
   }
 
   // Stream<UsersCubitBlState> _mapEventToStateBl(UsersEventsBloc event) async* {
