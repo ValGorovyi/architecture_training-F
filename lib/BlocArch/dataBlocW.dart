@@ -1,11 +1,12 @@
 import 'package:architecture_training/BlocArch/blocs/usersBloc.dart'
     show
         UserBlocLib,
-        UsersBlocLibState,
+        UserBlocLibState,
         UserIncrementEventBloc,
         UserDecrementEventBloc,
         UsersInitializedEventBloc;
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 
 class DataBlocW extends StatelessWidget {
@@ -13,26 +14,38 @@ class DataBlocW extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Provider(
+    return BlocProvider(
       create: (context) =>
           UserBlocLib()
             ..add(UsersInitializedEventBloc()), // загружает данные из хранилища
-      builder: (context, child) =>
-          Scaffold(body: Center(child: WidgetBuilderBloc())),
-      dispose: (context, blocLibValue) => blocLibValue.close(),
+      child: Scaffold(body: Center(child: WidgetBuilderBloc())),
     );
   }
 }
+
+// BlocConsumer = BlocListener + BlocBuilder
 
 class WidgetBuilderBloc extends StatelessWidget {
   const WidgetBuilderBloc({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [_AppTitle(), IncrementBlocButtonW(), DecrementBlocButtonW()],
+    return BlocListener<UserBlocLib, UserBlocLibState>(
+      // listenWhen: (previous, current) => previous != current,
+      listener: (context, state) {
+        // didChangeDependence
+        // просто позволяет слушать. стейтфул виджет
+        print(state.currentUser.age);
+      },
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            _AppTitle(),
+            IncrementBlocButtonW(),
+            DecrementBlocButtonW(),
+          ],
+        ),
       ),
     );
   }
@@ -41,15 +54,19 @@ class WidgetBuilderBloc extends StatelessWidget {
 class _AppTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final blocLib = context.read<UserBlocLib>();
-    return StreamBuilder<UsersBlocLibState>(
-      stream: blocLib.stream,
-      initialData: blocLib.state,
-      builder: (context, snapshot) {
-        final age = snapshot.requireData.currentUser.age;
-        return Text('$age');
-      },
+    final age = context.select(
+      (UserBlocLib bloc) => bloc.state.currentUser.age,
     );
+    return Text('$age');
+    //////////////////////////
+    // return BlocBuilder<UserBlocLib, UsersBlocLibState>(
+    // buildWhen: (previous, current) =>
+    //     previous.currentUser.age > current.currentUser.age,
+    // builder: (context, state) {
+    //   final age = state.currentUser.age;
+    //   return Text('$age');
+    // },
+    // );
   }
 }
 
@@ -80,3 +97,14 @@ class DecrementBlocButtonW extends StatelessWidget {
     );
   }
 }
+
+
+//  final blocLib = context.read<UserBlocLib>();
+//     return StreamBuilder<UsersBlocLibState>(
+//       stream: blocLib.stream,
+//       initialData: blocLib.state,
+//       builder: (context, snapshot) {
+//         final age = snapshot.requireData.currentUser.age;
+//         return Text('$age');
+//       },
+//     );

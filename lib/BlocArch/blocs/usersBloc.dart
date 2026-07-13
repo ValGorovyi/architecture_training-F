@@ -15,19 +15,19 @@ class UserDecrementEventBloc implements UserEventsBloc {}
 
 class UsersInitializedEventBloc implements UserEventsBloc {}
 
-class UsersBlocLibState {
+class UserBlocLibState {
   final UserEntityBl currentUser;
-  UsersBlocLibState({required this.currentUser});
+  UserBlocLibState({required this.currentUser});
 
-  UsersBlocLibState copyWith({UserEntityBl? currentUser}) {
-    return UsersBlocLibState(currentUser: currentUser ?? this.currentUser);
+  UserBlocLibState copyWith({UserEntityBl? currentUser}) {
+    return UserBlocLibState(currentUser: currentUser ?? this.currentUser);
   }
 
   @override
   String toString() => 'UsersBlocState(currentUser: $currentUser)';
 
   @override
-  bool operator ==(covariant UsersBlocLibState other) {
+  bool operator ==(covariant UserBlocLibState other) {
     if (identical(this, other)) return true;
 
     return other.currentUser == currentUser;
@@ -37,29 +37,52 @@ class UsersBlocLibState {
   int get hashCode => currentUser.hashCode;
 }
 
-class UserBlocLib extends Bloc<UserEventsBloc, UsersBlocLibState> {
+class UserBlocLib extends Bloc<UserEventsBloc, UserBlocLibState> {
   final _userDataLevelBloc = UserDataLevelBloc();
-  UserBlocLib() : super(UsersBlocLibState(currentUser: UserEntityBl(age: 0))) {
+  UserBlocLib() : super(UserBlocLibState(currentUser: UserEntityBl(age: 0))) {
     on<UserEventsBloc>(
       (event, emit) async {
         if (event is UsersInitializedEventBloc) {
           final user = await _userDataLevelBloc.loadData();
-          emit(UsersBlocLibState(currentUser: user));
+          emit(UserBlocLibState(currentUser: user));
         } else if (event is UserIncrementEventBloc) {
           var user = state.currentUser;
           user = user.copyWith(age: user.age + 1);
           await _userDataLevelBloc.saveData(user);
-          emit(UsersBlocLibState(currentUser: user));
+          emit(UserBlocLibState(currentUser: user));
         } else if (event is UserDecrementEventBloc) {
           var user = state.currentUser;
           user = user.copyWith(age: max(user.age - 1, 0));
           await _userDataLevelBloc.saveData(user);
-          emit(UsersBlocLibState(currentUser: user));
+          emit(UserBlocLibState(currentUser: user));
         }
       },
       transformer:
           sequential(), //фиксит гонку состояний, некккоректную обработку запросов
     );
+
+    // on<UserIncrementEventBloc>((event, emit) async {
+    //   if (event is UserIncrementEventBloc) {
+    //     var user = state.currentUser;
+    //     user = user.copyWith(age: user.age + 1);
+    //     await _userDataLevelBloc.saveData(user);
+    //     emit(UsersBlocLibState(currentUser: user));
+    //   }
+    // }, transformer: sequential());
+    // on<UserDecrementEventBloc>((event, emit) async {
+    //   if (event is UserDecrementEventBloc) {
+    //     var user = state.currentUser;
+    //     user = user.copyWith(age: user.age - 1);
+    //     await _userDataLevelBloc.saveData(user);
+    //     emit(UsersBlocLibState(currentUser: user));
+    //   }
+    // }, transformer: sequential());
+    // on<UsersInitializedEventBloc>((event, emit) async {
+    //   if (event is UsersInitializedEventBloc) {
+    //     final user = await _userDataLevelBloc.loadData();
+    //     emit(UsersBlocLibState(currentUser: user));
+    //   }
+    // }, transformer: sequential());
   }
 
   // Stream<UsersCubitBlState> _mapEventToStateBl(UsersEventsBloc event) async* {
