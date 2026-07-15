@@ -1,3 +1,4 @@
+import 'package:architecture_training/BlocArch/blocs/blocObserver.dart';
 import 'package:architecture_training/BlocArch/dataBlocW.dart' show DataBlocW;
 import 'package:architecture_training/MVVMarch/mvvmLes.dart'
     show AppCounterWidget;
@@ -8,11 +9,13 @@ import 'package:architecture_training/loaderWidget.dart';
 
 import 'package:architecture_training/navigationNames/mainNavigationNames.dart'
     show MainNavigationNames;
+import 'package:bloc/bloc.dart';
 
 import 'package:flutter/material.dart';
 
 void main() {
   final app = MaterialApp(home: DataBlocW());
+  Bloc.observer = MyBlocObserver();
   runApp(app);
 }
 //////////////////////////////////////////////

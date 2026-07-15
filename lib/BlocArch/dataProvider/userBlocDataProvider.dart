@@ -21,7 +21,7 @@ class UserDataLevelBloc {
     // if (counterInt % 2 == 0) {
     //   await Future.delayed(Duration(seconds: 1));
     // }
-    print(user.age);
+    // print(user.age);
     (await sharedPref).setInt('intBlocUser', user.age);
   }
 }

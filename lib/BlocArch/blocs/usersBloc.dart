@@ -7,13 +7,30 @@ import 'package:architecture_training/BlocArch/entity/userBlocEntity.dart'
 import 'package:bloc/bloc.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 
+//про стейт. с сервера может приходить или юсер или ошибка. как решить
+abstract class SomeState {}
+
+class SomeSucsesState extends SomeState {
+  final UserEntityBl currentUser;
+
+  SomeSucsesState({required this.currentUser});
+}
+
+class SomeErrorState extends SomeState {
+  final String error;
+
+  SomeErrorState({required this.error});
+}
+
+//////////
+
 abstract class UserEventsBloc {}
 
 class UserIncrementEventBloc implements UserEventsBloc {}
 
 class UserDecrementEventBloc implements UserEventsBloc {}
 
-class UsersInitializedEventBloc implements UserEventsBloc {}
+class UserInitializedEventBloc implements UserEventsBloc {}
 
 class UserBlocLibState {
   final UserEntityBl currentUser;
@@ -42,7 +59,7 @@ class UserBlocLib extends Bloc<UserEventsBloc, UserBlocLibState> {
   UserBlocLib() : super(UserBlocLibState(currentUser: UserEntityBl(age: 0))) {
     on<UserEventsBloc>(
       (event, emit) async {
-        if (event is UsersInitializedEventBloc) {
+        if (event is UserInitializedEventBloc) {
           final user = await _userDataLevelBloc.loadData();
           emit(UserBlocLibState(currentUser: user));
         } else if (event is UserIncrementEventBloc) {
@@ -50,6 +67,7 @@ class UserBlocLib extends Bloc<UserEventsBloc, UserBlocLibState> {
           user = user.copyWith(age: user.age + 1);
           await _userDataLevelBloc.saveData(user);
           emit(UserBlocLibState(currentUser: user));
+          // throw 'demo incremenr error';
         } else if (event is UserDecrementEventBloc) {
           var user = state.currentUser;
           user = user.copyWith(age: max(user.age - 1, 0));
